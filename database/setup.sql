@@ -1,0 +1,1 @@
+-- For the setup of the PostgreSQL database
