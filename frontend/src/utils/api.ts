@@ -1,11 +1,14 @@
 // Base of the url, can change in production, automaticaly given by wite
 export const BaseUrl = import.meta.env.BASE_URL;
-// Url of the backend, given by the .env files
-export const APIOrigin = import.meta.env.VITE_BACKEND_ORIGIN;
+// URL of the backend, given by the .env files
+// in prod, directly call the server
+export const APIOrigin = import.meta.env.PROD ? "" : import.meta.env.VITE_BACKEND_ORIGIN;
 
 const Api = {
     test: {
         get: () => {
+            // eslint-disable-next-line no-console
+            console.log(`This instance is in ${import.meta.env.PROD ? "prod" : "dev"} mode`);
             return sendApiRequest("GET", "test", {}, "Testing " + APIOrigin);
         }
     }

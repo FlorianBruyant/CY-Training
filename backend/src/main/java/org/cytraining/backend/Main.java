@@ -6,6 +6,15 @@ import static io.javalin.apibuilder.ApiBuilder.path;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.jooq.Configuration;
+import org.jooq.ConnectionProvider;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.conf.Settings;
+import org.jooq.impl.DSL;
+import org.jooq.impl.DataSourceConnectionProvider;
+import org.jooq.impl.DefaultConfiguration;
+import org.jooq.impl.DefaultTransactionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MarkerFactory;
@@ -42,7 +51,7 @@ public class Main {
         // it is overriden by "System.getProperty("env")", when you build for prod.
         // Setting anything in the mode property will make the program believe it's in
         // production mode
-        boolean dev_mode = System.getProperty("mode").isEmpty() && dotenv.get("APP_MODE") != "prod";
+        boolean dev_mode = System.getProperty("mode") == null && dotenv.get("APP_MODE") != "prod";
 
         if (dev_mode) {
             log.warn("This instance is in development mode. Do not use it for production!");
@@ -64,34 +73,57 @@ public class Main {
         hc.addDataSourceProperty("prepStmtCacheSize", "250");
         hc.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
         hc.addDataSourceProperty("tcpKeepAlive", "true");
-        HikariDataSource ds = new HikariDataSource(hc);
+        hc.setConnectionTimeout(30000);
+        hc.setLeakDetectionThreshold(60000);
+        HikariDataSource hds = new HikariDataSource(hc);
+
+        // setting up jOOQ
+        Exception jOOQException = jOOQSetup.setup();
+        if (jOOQException != null) {
+            log.error(MarkerFactory.getMarker("FATAL"), "Failed to setup jOOQ:", jOOQException);
+            return;
+        }
+
+        Settings settings = new Settings()
+                .withRenderFormatted(true)
+                .withExecuteLogging(true);
+
+        ConnectionProvider cp = new DataSourceConnectionProvider(hds);
+
+        Configuration configuration = new DefaultConfiguration()
+                .set(cp)
+                .set(new DefaultTransactionProvider(cp))
+                .set(SQLDialect.POSTGRES)
+                .set(settings);
+
+        DSLContext dsl = DSL.using(configuration);
 
         // Test connection
         try {
-            Connection connection = ds.getConnection();
+            Connection connection = hds.getConnection();
             log.info("Successfully connect to PostgreSQL server");
             connection.close();
         } catch (SQLException e) {
             log.error(MarkerFactory.getMarker("FATAL"), "Failed to connecto to PostgreSQL server:", e);
-            ds.close();
+            hds.close();
             return;
         }
 
         // Javalin app
         Javalin app = Javalin.create(config -> {
-            // allow specific host on the api (CORS Access-Control-Allow-Origin)
-            config.bundledPlugins.enableCors(cors -> {
-                cors.addRule(it -> {
-                    if (dev_mode) {
+            // allow specific host on the api (CORS Access-Control-Allow-Origin), but ONLY
+            // for dev mode
+            // because in production, the backend and frontend are both served using the
+            // same javalin server, so there are no cross origin requests
+            if (dev_mode) {
+                config.bundledPlugins.enableCors(cors -> {
+                    cors.addRule(it -> {
                         log.warn(
-                                "Development mode enabled, allowing any host. This should not be used is production mode. See the .env file.");
+                                "Development mode enabled, allowing any host. This should not be used is production mode.");
                         it.anyHost();
-                    } else {
-                        // enable only the website to make request
-                        it.allowHost("127.0.0.1");
-                    }
+                    });
                 });
-            });
+            }
 
             if (dev_mode) {
                 // for in depth automatic logging on each request
@@ -105,6 +137,7 @@ public class Main {
                 config.showJavalinBanner = false;
                 config.requestLogger.http((ctx, ms) -> {
                     // production logging
+                    log.info("[ " + ctx.ip() + "\t] " + ctx.url() + ": " + ctx.res().getStatus());
                 });
 
                 // will serve the built static frontend files
@@ -143,7 +176,7 @@ public class Main {
         // for clean shutdown
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             app.stop();
-            ds.close();
+            hds.close();
         }));
     }
 }

@@ -111,7 +111,7 @@ GRANT USAGE, SELECT ON SEQUENCES TO cytraining;
 
 ## Running
 
-To launch the application, you need **two** process:
+To launch the application, you need **two** processes:
 - One for the frontend.
 - One for the backend.
 
@@ -158,3 +158,5 @@ java -Dmode=production -jar ./target/cytraining-VERSION.jar
 > [!IMPORTANT]
 > The `-Dmode=production` tells Java that this run is in production mode, whatever the [.env](/backend/.env) "APP_MODE" is.  
 > If you are not sure, you will see in the logs a message telling which mode the application is running in.
+
+Remember to change the privileges on the PostgreSQL user when in production mode, or use another user.
