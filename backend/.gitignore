@@ -18,3 +18,7 @@ buildNumber.properties
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+
+# generated jOOQ code
+src/main/java/org/cytraining/backend/model/*
+!src/main/java/org/cytraining/backend/model/.gitkeep

@@ -11,6 +11,7 @@ Our goal is to make an interractive platform to enable student to create their o
   - [Requirements](#requirements)
   - [Installation](#installation)
     - [PoestgreSQL setup](#poestgresql-setup)
+    - [jOOQ](#jooq)
   - [Running](#running)
   - [Building and production](#building-and-production)
 
@@ -109,6 +110,37 @@ GRANT USAGE, SELECT ON SEQUENCES TO cytraining;
 > Do not forget to put the password of the **cytraining** user into the [./backend/.env](./backend/.env) file under `DATABASE_PASS`.
 > If you change the backend URL or port, mirror the changes in [./frontend/src/.env.development](./frontend/src/.env.development) and [./frontend/src/.env.production](./frontend/src/.env.production).
 
+If you run PostgreSQL from Docker (with the [compose](./docker-compose.yaml) file), you only need to do this:
+```sh
+# connect to the PostgreSQL inside Docker
+docker compose exec database psql -U cytraining
+# then grant all the privileges from above
+```
+
+To run SQL files, do this:
+```sh
+# run the setup.sql file
+# replace this path with any path you want, relative to your current folder
+docker compose exec -T database psql -U cytraining < ./database/setup.sql
+```
+
+If you want to reset your database, do this, then redo all the previous steps:
+```sh
+docker compose down -v
+```
+
+### jOOQ
+
+We use jOOQ to have type safe PostgreSQL queries. To do that, jOOQ will generate code for each tables inside the *cytraining* database, into the [model](./backend/src/main/java/org/cytraining/backend/model/) folder.
+
+It is, by default, automatically generated before each execution. You can howver change that behavior in [jooq-setup.properties](./backend/src/main/resources/jooq-setup.properties).
+
+If you want to generate the code manually, run:
+```sh
+cd backend
+mvn exec:java@manual-jooq-setup
+```
+
 ## Running
 
 To launch the application, you need **two** processes:
@@ -125,9 +157,9 @@ To launch the backend:
 ```sh
 cd ./backend
 # Debiant / Ubuntu
-./mvnw.sh compile exec:java
+./mvnw.sh exec:java
 # Windows
-./mvnw.cmd compile exec:java
+./mvnw.cmd exec:java
 ```
 
 ## Building and production

@@ -20,8 +20,8 @@ async function init() {
     app.use(
         createI18n({
             legacy: false,
-            locale: "en",
-            fallbackLocale: "en",
+            locale: "fr",
+            fallbackLocale: "fr",
             messages: {
                 en,
                 fr

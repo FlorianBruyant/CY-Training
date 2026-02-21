@@ -1,0 +1,14 @@
+services:
+    database:
+        image: postgres:latest
+        ports:
+            - 5432:5432
+        environment:
+            - POSTGRES_DB=cytraining
+            - POSTGRES_USER=cytraining
+            - POSTGRES_PASSWORD=awesomepassword
+        volumes:
+            - postgresql:/var/lib/postgresql
+
+volumes:
+    postgresql:

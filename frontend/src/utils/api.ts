@@ -1,3 +1,5 @@
+import { type ApiRequest } from "../models/api.model";
+
 // Base of the url, can change in production, automaticaly given by wite
 export const BaseUrl = import.meta.env.BASE_URL;
 // URL of the backend, given by the .env files
@@ -9,7 +11,12 @@ const Api = {
         get: () => {
             // eslint-disable-next-line no-console
             console.log(`This instance is in ${import.meta.env.PROD ? "prod" : "dev"} mode`);
-            return sendApiRequest("GET", "test", {}, "Testing " + APIOrigin);
+            return sendApiRequest<ApiRequest<{ message: string }>>(
+                "GET",
+                "test",
+                {},
+                "Testing " + APIOrigin
+            );
         }
     }
 };

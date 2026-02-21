@@ -52,14 +52,12 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.7.10</version>
-            <scope>compile</scope>
         </dependency>
         <!-- Source: https://mvnrepository.com/artifact/io.javalin/javalin -->
         <dependency>
             <groupId>io.javalin</groupId>
             <artifactId>javalin</artifactId>
             <version>6.7.0</version>
-            <scope>compile</scope>
         </dependency>
         <!-- Source: https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
         <dependency>
@@ -73,12 +71,17 @@
             <artifactId>slf4j-api</artifactId>
             <version>2.0.17</version>
         </dependency>
+        <!-- Source: https://mvnrepository.com/artifact/org.slf4j/jcl-over-slf4j -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>2.0.17</version>
+        </dependency>
         <!-- Source: https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>7.0.2</version>
-            <scope>compile</scope>
         </dependency>
         <!-- Source:
         https://www.jooq.org/doc/latest/manual/getting-started/tutorials/jooq-in-7-steps/jooq-in-7-steps-step1/ -->
@@ -92,14 +95,25 @@
             <groupId>org.jooq</groupId>
             <artifactId>jooq-meta</artifactId>
             <version>3.20.11</version>
-            <scope>compile</scope>
         </dependency>
         <!-- Source: https://mvnrepository.com/artifact/org.jooq/jooq-codegen -->
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq-codegen</artifactId>
             <version>3.20.11</version>
-            <scope>compile</scope>
+        </dependency>
+        <!-- Source:
+        https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+            <version>7.1.0-M2</version>
+        </dependency>
+        <!-- Source: https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.21.0</version>
         </dependency>
     </dependencies>
 
@@ -169,6 +183,34 @@
                 <configuration>
                     <mainClass>org.cytraining.backend.Main</mainClass>
                 </configuration>
+                <executions>
+                    <execution>
+                        <!-- manualy run the jOOQ code generator -->
+                        <id>manual-jooq-setup</id>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.cytraining.backend.jOOQSetup</mainClass>
+                            <arguments>
+                                <argument>manual</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <!-- to automatically run jOOQ code generator before each compilation -->
+                    <execution>
+                        <?m2e execute onConfiguration?>
+                        <id>jooq-setup</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.cytraining.backend.jOOQSetup</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -217,7 +259,7 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>[25,)</version>
+                                    <version>25</version>
                                 </requireJavaVersion>
                             </rules>
                             <fail>true</fail>
