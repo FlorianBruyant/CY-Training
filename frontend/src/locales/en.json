@@ -1,0 +1,16 @@
+{
+    "dev": {
+        "typeError": "🌐 Network error.\nDid you launch the backend?"
+    },
+    "error": {
+        "fetch": "🌐 You are not connected to internet.\nCheck your connection. 🔌",
+        "server": "💥 Server side error.\nPlease retry later. 🛠️",
+        "notFound": {
+            "page": "The page you're looking for doesn't exist.\nCheck the URL. 🔎",
+            "view": "404 Error\nYou seem lost"
+        }
+    },
+    "button": {
+        "submit": "Confirm"
+    }
+}

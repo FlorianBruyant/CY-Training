@@ -1,0 +1,16 @@
+{
+    "dev": {
+        "typeError": "🌐 Erreur réseau.\nAvez-vous lancé le backend?"
+    },
+    "error": {
+        "fetch": "🌐 Vous n'êtes pas connecté à internet.\nVérifiez votre connexion. 🔌",
+        "server": "💥 Erreur côté serveur.\nVeuillez réessayer plus tard. 🛠️",
+        "notFound": {
+            "page": "La page que vous cherchez n'existe pas.\nVérifiez l'adresse. 🔎",
+            "view": "Erreur 404\nVous semblez perdu"
+        }
+    },
+    "button": {
+        "submit": "Confirmer"
+    }
+}
