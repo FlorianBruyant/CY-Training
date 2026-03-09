@@ -13,6 +13,8 @@ CREATE TABLE account(
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
 
+    email_verified BOOL NOT NULL DEFAULT TRUE,
+
     -- email format validation
     CONSTRAINT account_email_format_constraint
         CHECK (
